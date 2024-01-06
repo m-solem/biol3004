@@ -1,0 +1,9 @@
+Accessed via Filezilla (host IP: mesabi.msi.umn.edu)
+HMP.biom: /panfs/jay/groups/24/biol3004/shared/data/HMP/HMP.biom
+HMP_mapping_file.txt: /panfs/jay/groups/24/biol3004/shared/data/HMP/HMP_mapping_file.txt
+HMP_qiime2_table.tsv: /panfs/jay/groups/24/biol3004/shared/data/HMP/HMP_qiime2_table.tsv
+table.from_biom.txt: /panfs/jay/groups/24/biol3004/shared/data/HMP/table.from_biom.txt
+table_from_HMP.txt: /panfs/jay/groups/24/biol3004/stier074/table_from_HMP.txt
+weighted-distance-matrix.txt: /panfs/jay/groups/24/biol3004/stier074/weighted-distance-matrix.txt
+hmp_rarefied_table.txt: /panfs/jay/groups/24/biol3004/stier074/hmp_rarefied_table.txt
+Unweighted.txt: /panfs/jay/groups/24/biol3004/stier074/Unweighted.txt
