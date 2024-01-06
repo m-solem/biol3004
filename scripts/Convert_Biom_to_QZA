@@ -1,0 +1,11 @@
+#!/bin/bash -l
+#SBATCH --time=8:00:00
+#SBATCH --ntasks=8
+#SBATCH --mem=10g
+#SBATCH --tmp=10g
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=solem087@umn.edu
+cd /home/biol3004/solem087
+module load qiime2/2018.11
+
+qiime tools import --input-path HMP.biom --type 'FeatureTable[Frequency]' --input-format BIOMV100Format --output-path HMP.qza
