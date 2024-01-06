@@ -3,5 +3,5 @@ Foundations of Biology Lab II (BIOL3004). This class involved a semester-long gr
 Acknowledgements: Thank you to my group members (Andrew Stier, Kelia Nsoh, and Dosbol Narimanuly) for their contributions. Thank you to our Graduate TA (Natalie Bennett) 
 for all of her assistance and guidance.
 
-Citation: The Human Microbiome Project Consortium. Structure, function and diversity of the healthy human microbiome. Nature 486, 207–214 (2012).
+Citations: The Human Microbiome Project Consortium. Structure, function and diversity of the healthy human microbiome. Nature 486, 207–214 (2012).
 https://doi.org/10.1038/nature11234
