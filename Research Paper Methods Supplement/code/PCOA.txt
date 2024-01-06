@@ -1,0 +1,108 @@
+setwd("~/Desktop")
+otu_table <- read.table('hmp_rarefied_table.txt', 
+                        comment="",
+                        header=TRUE,
+                        sep="\t",
+                        skip=1,
+                        as.is=TRUE,
+                        check.names=F,
+                        row=1)
+
+metadata <- read.table("HMP_mapping_file.txt", 
+                       sep = "\t", 
+                       comment="", 
+                       header=T,
+                       check.names=F, 
+                       row=1)
+
+
+#Converted from qza -> biom -> 
+alpha <- as.data.frame(read.table("alpha-diversity.tsv",
+                                  sep='\t',
+                                  header=TRUE,
+                                  as.is=TRUE,
+                                  check.names=FALSE,
+                                  row=1))
+
+beta <- as.matrix(read.table("TA_bray_curtis-matrix.tsv",
+                             sep = "\t",
+                             header=T,
+                             row = 1,
+                             as.is = T,
+                             check.names = F))
+#metadata <- metadata[metadata$BODY_SITE=="UBERON:tongue" | metadata$BODY_SITE=="UBERON:fossa" | metadata$BODY_SITE=="UBERON:skin" | metadata$BODY_SITE=="UBERON:nostril" | metadata$BODY_SITE=="UBERON:mouth" | metadata$BODY_SITE=="UBERON:feces" | metadata$BODY_SITE=="UBERON:oropharynx",]
+
+
+# combining data (from lab manual)
+
+# First, define all the samples in the OTU table.
+
+# Remember, the last column in the OTU table is taxonomy (don't use it)
+# samples1 <- colnames(otu_table)[1:(ncol(otu_table)-1)]
+# Now let's see what the intersect with the metadata row names are
+# IDs_Keep_OTU <- intersect(colnames(beta), colnames(otu_table))
+# IDs_Keep_meta <- intersect(colnames(beta), rownames(metadata))
+# IDs_Keep <- intersect(IDs_Keep_OTU, IDs_Keep_meta) 
+
+
+IDs_Keep <- intersect(colnames(otu_table), rownames(metadata))
+# Now let's filter the metadata to keep only those samples
+# We tell R to make a new data frame that only has the rows we want
+metadata2 <- metadata[IDs_Keep,]
+# Now let's filter the OTU table to keep just the intersecting samples
+
+
+otu2 <- otu_table[,IDs_Keep] #for rarefied
+
+# the orignal table 
+#otu2$taxonomy <- otu_table$taxonomy
+
+# Alpha diversity has the samples as row names
+alpha <- alpha[IDs_Keep, ]
+metadata2$alpha <- alpha 
+# Now let's filter the beta diversity table to keep those samples too
+# Beta diversity has the samples as row names AND column names
+# We must filter both the rows and columns
+beta <- beta[IDs_Keep, IDs_Keep ] 
+#Let's check to make sure the samples match
+# as.character(rownames(metadata)) == colnames(otu2)[1:(ncol(otu2)-1)]
+# ncol(otu_table)
+# ncol(otu2)
+metadata1 <- metadata
+
+
+library(ape)
+#install.packages("ape")
+library(vegan)
+library(ggplot2)
+# combine metadata and alpha data
+# Because our sample order is the same, we can make a new column in the table
+# This column will contain all the Shannon index measurements for the samples
+######
+PCOA <- data.frame(pcoa(beta)$vectors) 
+PCOA
+names <- rep("",ncol(PCOA))
+names
+for(i in 1:ncol(PCOA)){
+  names[i] <- paste("PC",i,sep="")
+}
+names
+names(PCOA) <- names
+names
+metadata2$SampleID <-rownames(metadata2)
+PCOA <- merge(PCOA,metadata2)
+PCOA
+levels
+
+########## <-------- I have tried running the above code just on the beta text file, and it did actually work without the subsetting, we just cant access any columns
+library(ggplot2)
+
+# plotting for gut microbiome, color = chronic condition, grouped by sex
+ggplot() +
+  geom_boxplot(data=metadata2, aes(x= BODY_SITE, y= alpha, fill= CHRONIC_CONDITION)) +
+  scale_fill_manual(values= c("cadetblue3", "white", "grey")) + labs(x = "Body Site", y = "Shannon DIversity")
+
+ggplot(PCOA) + 
+  geom_point(aes(x=PC1, y=PC2, color = PC1)) # <-------- This creaes a PCOA plot with no labels or colors, but at least it creates something. Change PC1 to "CHRONIC_CONDITION".
+#FooterUniversity of Minnesota
+#University of Minnesota
