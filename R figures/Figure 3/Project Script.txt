@@ -1,0 +1,107 @@
+
+#This is the working directory
+setwd("c:/school/coding/Bio Lab")
+
+#Rarefied table. We had an issue with this before. 
+otu_table <- read.table('hmp_rarefied_table.txt', 
+                        comment="",
+                        header=TRUE,
+                        sep="\t",
+                       skip=1,
+                        as.is=TRUE,
+                       check.names=F,
+                        row=1)
+
+metadata <- read.table("HMP_mapping_file.txt", 
+                       sep = "\t", 
+                       comment="", 
+                       header=T,
+                       check.names=F, 
+                       row=1)
+
+
+#Converted from qza -> biom -> tsv
+alpha <- as.data.frame(read.table("alpha-diversity.tsv",
+                    sep='\t',
+                    header=TRUE,
+                    as.is=TRUE,
+                    check.names=FALSE,
+                    row=1))
+#Lab manual says to use .txt, but im pretty sure .tsv also works
+beta <- as.matrix(read.table("weighted-distance-matrix.txt",
+                             sep = "\t",
+                             header=T,
+                             row = 1,
+                             as.is = T,
+                             check.names = F))
+
+#Section where we subswt to data to remove unwanted categories. Also makes the dataset smaller so our laptops can run it.
+#metadata <- metadata[metadata$BODY_SITE=="UBERON:fossa" ,]
+#metadata <- metadata[metadata$BODY_SITE=="UBERON:stool" ,]
+#metadata <- metadata[metadata$BODY_SITE=="UBERON:nostril" ,]
+metadata <- metadata[metadata$BODY_SITE=="UBERON:vaginal fornix" ,]
+metadata
+
+#Our OTU table doesn't have a taxonomy column, so we don't remove the last column
+
+
+IDs_Keep <- intersect(colnames(otu_table), rownames(metadata))
+
+# Now let's filter the metadata to keep only those samples
+metadata2 <- metadata[IDs_Keep,]
+
+
+
+# Alpha diversity has the samples as row names
+alpha <- alpha[IDs_Keep, ]
+
+#Add an alpha column to the metadata
+metadata2$alpha <- alpha
+
+# Now let's filter the beta diversity table to keep those samples too
+# Beta diversity has the samples as row names AND column names
+beta <- beta[IDs_Keep,IDs_Keep]
+
+
+#These libraries are required for the alpha and beta diverissty figures
+library(ape)
+library(vegan)
+library(ggplot2)
+
+#Create a PCOA of beta file using the PCOA function
+PCOA <- data.frame(pcoa(beta)$vectors)
+#Checking to see it worked
+
+#Making sure the PCOA has names for each sample
+names <- rep("",ncol(PCOA))
+#Checking the names worked
+
+
+#Assigning the names to vairables that we can manipulate
+for(i in 1:ncol(PCOA)){
+  names[i] <- paste("PC",i,sep="")
+}
+names
+
+#Assigning the names to the samples of the PCOA
+names(PCOA) <- names
+
+#Adds a SampleID column to PCOA
+PCOA$SampleID <- rownames(PCOA)
+
+#Creating the SampleID row in metada
+metadata2$SampleID <-rownames(metadata2)
+
+#Merges metada and PCOA so that the PCOA has the columns and what not.
+PCOA <- merge(PCOA,metadata2, by = "SampleID")
+
+
+library(ggplot2)
+
+library(ggpubr)
+
+t.test(metadata2$CHRONIC_CONDITION == "y", y = metadata2$CHRONIC_CONDITION == "n")
+
+ggplot(data = PCOA, aes(x=PC1, y=PC2, color = CHRONIC_CONDITION)) + geom_point() + stat_ellipse(alpha = 0.3, geom = "polygon", linetype = "blank", aes(x = PC1, y = PC2, fill = CHRONIC_CONDITION)) + labs(caption = "p-value < 2.2e-16")
+
+# adding p-values, source: data novia
